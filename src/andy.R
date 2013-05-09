@@ -23,7 +23,8 @@ points(sc.sig[ind.na,1], sc.sig[ind.na,2], col="red")
 #Supervised
 
 #glmnet lasso
-cv.glm.dat<-cv.glmnet(data.full[,-1], data.full[,1], alpha=1)
+
+cv.glm.dat<-cv.glmnet(data.full[,-1], data.full[,1])
 lambda.min<-cv.glm.dat$lambda.min
 glm.dat<-glmnet(data.full[,-1], data.full[,1], family="multinomial", lambda=lambda.min)
 pred.glm.na<-predict(glm.dat, newx=data.na[,-1], s=lambda.min, type="response")
@@ -41,10 +42,12 @@ for ( i in 1:nrow(data.full)){
 
 length(which(crime.glm.full!=data.full[,1]))
 
+pred.recalc<-predict(glm.dat, data.na[recalc,-1], s=lambda.min, type="response")
+
+#cv
 case<-rep(1:10, length.out=nrow(data.full))
 case<-sample(case)
 
-#cv
 misclass<-rep(10, 0)
 for (i in 1:5) {
   train<-data.full[-which(case==i),]

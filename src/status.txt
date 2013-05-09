@@ -1,0 +1,14 @@
+Pagerank
+Clustering
+PCA
+Correlation Analysis
+Regressions: 
+    Ridge: N/A, need classification
+    LASSO: 42%
+LDA
+Logistic Regression
+kNN: 42% error rate at k=13
+Tree: 42%
+Random Forest: 34% error rate
+
+two-stage RF then GLM: 30.7%
