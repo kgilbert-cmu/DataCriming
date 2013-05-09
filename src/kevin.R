@@ -30,6 +30,10 @@ for(f in 1:n.folds)
     train = clean[f != folds,2:93]
     test = clean[f == folds,2:93]
     model = randomForest(train,y=as.factor(clean[f!= folds, 1]))
+    while(model$err.rate[100,1] > .25)
+    {
+        model = randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=100)
+    }
     res = predict(model, newdata=test)
     probs = predict(model, newdata=test, type = "prob")
     conf = apply(probs,1,sort)
@@ -57,7 +61,11 @@ library(glmnet)
 library(randomForest)
 cv.glm.dat<-cv.glmnet(clean[,2:93], clean[,1])
 lambda.min<-cv.glm.dat$lambda.min
-model = randomForest(clean[,2:93], y = as.factor(clean[,1]))
+model = randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=100)
+while(model$err.rate[100,1] > .25)
+{
+    model = randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=100)
+}
 crime.pred = predict(model, newdata=neighbor.dat[missing,2:93])
 probs = predict(model, newdata=neighbor.dat[missing,2:93], type = "prob")
 conf = apply(probs,1,sort)
@@ -73,7 +81,7 @@ if (length(recalc) > 0)
     }
     crime.pred[recalc] = pred.recalc
 }
-save(crime.pred, recalc, file="two-stage.Rdata") # THE 24
+save(crime.pred, file="paranormal.Rdata") # THE 24
 
 
 # whole data set training error
@@ -96,3 +104,8 @@ if (length(recalc > 0))
     crime.pred[recalc] = pred.recalc    
 }
 sum(crime.pred != clean[,1])/length(crime.pred) # 0 lol
+
+
+s = sapply(1:500, function(i) randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=i)$err.rate[i,1])
+plot(s, xlab = "Number of trees", ylab = "CV error", main = "Error of Growing Random Forest")
+points(smooth.spline(s), pch=16)
