@@ -61,10 +61,14 @@ library(glmnet)
 library(randomForest)
 cv.glm.dat<-cv.glmnet(clean[,2:93], clean[,1])
 lambda.min<-cv.glm.dat$lambda.min
-model = randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=100)
-while(model$err.rate[100,1] > .25)
+bestmodel = randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=100)
+while(bestmodel$err.rate[100,1] > .20)
 {
     model = randomForest(clean[,2:93], y = as.factor(clean[,1]), importance=T,ntree=100)
+    if (bestmodel$err.rate[100,1] > model$err.rate[100,1])
+    {
+        bestmodel = model
+    }
 }
 crime.pred = predict(model, newdata=neighbor.dat[missing,2:93])
 probs = predict(model, newdata=neighbor.dat[missing,2:93], type = "prob")
