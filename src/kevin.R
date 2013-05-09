@@ -67,23 +67,23 @@ crime.pred[recalc] = pred.recalc
 save(crime.pred, recalc, file="randomForest.Rdata") # THE 24
 
 
-# whole data set
-cv.glm.dat<-cv.glmnet(data.full[,-1], data.full[,1])
+# whole data set training error
+cv.glm.dat<-cv.glmnet(clean[,2:93], clean[,1])
 lambda.min<-cv.glm.dat$lambda.min
-glm.dat<-glmnet(data.full[,-1], data.full[,1], family="multinomial", lambda=lambda.min)
-pred.glm.na<-predict(glm.dat, newx=data.na[,-1], s=lambda.min, type="response")
-pred.glm.full<-predict(glm.dat, newx=data.full[,-1], s=lambda.min, type="response")
-crime.glm.na<-rep(NA, nrow(data.na))
-crime.glm.full<-rep(NA, nrow(data.full))
-
-for (i in 1:nrow(data.na)) {
-    crime.glm.na[i]<-which.max(pred.glm.na[i,,1])
+model = randomForest(clean[,2:93], y = as.factor(clean[,1]))
+crime.pred = predict(model, newdata=clean[,2:93])
+probs = predict(model, newdata=clean[,2:93], type = "prob")
+conf = apply(probs,1,sort)
+recalc = which(conf[3,] - conf[2,] < .2)
+cv<-cv.glmnet(clean[,2:93], clean[, 1], alpha=1)
+glm.train<-glmnet(clean[,2:93], clean[, 1], family="multinomial", lambda=cv$lambda.min)
+if (length(recalc > 0))
+{
+    new.pred<-predict(glm.train, clean[as.integer(names(recalc)),2:93], s=lambda.min, type="response")
+    pred.recalc<-rep(NA, length(recalc))
+    for (j in 1:nrow(new.pred)) {
+        pred.recalc[j]<-which.max(new.pred[j,,1])
+    }
+    crime.pred[recalc] = pred.recalc    
 }
-
-for ( i in 1:nrow(data.full)){
-    crime.glm.full[i]<-which.max(pred.glm.full[i,,1])
-}
-
-length(which(crime.glm.full!=data.full[,1]))
-
-pred.recalc<-predict(glm.dat, data.na[recalc,-1], s=lambda.min, type="response")
+sum(crime.pred != clean[,1])/length(crime.pred) # 0 lol
