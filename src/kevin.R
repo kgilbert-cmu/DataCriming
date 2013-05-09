@@ -36,19 +36,25 @@ for(f in 1:n.folds)
     recalc = which(conf[3,] - conf[2,] < .2)
     
     # begin glm
-    cv<-cv.glmnet(train, clean[f!= folds, 1], alpha=1)
-    glm.train<-glmnet(train, clean[f!= folds, 1], family="multinomial", lambda=cv$lambda.min)
-    new.pred<-predict(glm.train, test[recalc,], s=lambda.min, type="response")
-    pred.recalc<-rep(NA, length(recalc))
-    for (j in 1:nrow(new.pred)) {
-        pred.recalc[j]<-which.max(new.pred[j,,1])
+    if (length(recalc > 0))
+    {
+        cv<-cv.glmnet(train, clean[f!= folds, 1], alpha=1)
+        glm.train<-glmnet(train, clean[f!= folds, 1], family="multinomial", lambda=cv$lambda.min)
+        new.pred<-predict(glm.train, test[recalc,], s=lambda.min, type="response")
+        pred.recalc<-rep(NA, length(recalc))
+        for (j in 1:nrow(new.pred)) {
+            pred.recalc[j]<-which.max(new.pred[j,,1])
+        }
+        res[recalc] = pred.recalc
     }
     
-    res[recalc] = pred.recalc
     errs[f] = sum(res != clean[f==folds,1])/length(res)
 }
+mean(errs)
 
 # final model!!
+library(glmnet)
+library(randomForest)
 cv.glm.dat<-cv.glmnet(clean[,2:93], clean[,1])
 lambda.min<-cv.glm.dat$lambda.min
 model = randomForest(clean[,2:93], y = as.factor(clean[,1]))
@@ -56,15 +62,18 @@ crime.pred = predict(model, newdata=neighbor.dat[missing,2:93])
 probs = predict(model, newdata=neighbor.dat[missing,2:93], type = "prob")
 conf = apply(probs,1,sort)
 recalc = which(conf[3,] - conf[2,] < .2)
-cv<-cv.glmnet(clean[,2:93], clean[, 1], alpha=1)
-glm.train<-glmnet(clean[,2:93], clean[, 1], family="multinomial", lambda=cv$lambda.min)
-new.pred<-predict(glm.train, neighbor.dat[as.integer(names(recalc)),2:93], s=lambda.min, type="response")
-pred.recalc<-rep(NA, length(recalc))
-for (j in 1:nrow(new.pred)) {
-    pred.recalc[j]<-which.max(new.pred[j,,1])
+if (length(recalc) > 0)
+{
+    cv<-cv.glmnet(clean[,2:93], clean[, 1], alpha=1)
+    glm.train<-glmnet(clean[,2:93], clean[, 1], family="multinomial", lambda=cv$lambda.min)
+    new.pred<-predict(glm.train, neighbor.dat[as.integer(names(recalc)),2:93], s=lambda.min, type="response")
+    pred.recalc<-rep(NA, length(recalc))
+    for (j in 1:nrow(new.pred)) {
+        pred.recalc[j]<-which.max(new.pred[j,,1])
+    }
+    crime.pred[recalc] = pred.recalc
 }
-crime.pred[recalc] = pred.recalc
-save(crime.pred, recalc, file="randomForest.Rdata") # THE 24
+save(crime.pred, recalc, file="two-stage.Rdata") # THE 24
 
 
 # whole data set training error
