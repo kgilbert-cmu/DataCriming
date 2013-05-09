@@ -22,7 +22,6 @@ colMeans(errs)
 
 cv.glm.dat<-cv.glmnet(clean[,2:93], clean[,1])
 lambda.min<-cv.glm.dat$lambda.min
-# glm.dat<-glmnet(data.full[,-1], data.full[,1], family="multinomial", lambda=lambda.min)
 n.folds = 4
 folds = sample(rep(1:n.folds,length.out=nrow(clean)))
 errs = rep(NA, n.folds)
@@ -49,12 +48,23 @@ for(f in 1:n.folds)
     errs[f] = sum(res != clean[f==folds,1])/length(res)
 }
 
+# final model!!
+cv.glm.dat<-cv.glmnet(clean[,2:93], clean[,1])
+lambda.min<-cv.glm.dat$lambda.min
 model = randomForest(clean[,2:93], y = as.factor(clean[,1]))
 crime.pred = predict(model, newdata=neighbor.dat[missing,2:93])
 probs = predict(model, newdata=neighbor.dat[missing,2:93], type = "prob")
 conf = apply(probs,1,sort)
 recalc = which(conf[3,] - conf[2,] < .2)
-save(crime.pred, recalc, file="randomForest.Rdata")
+cv<-cv.glmnet(clean[,2:93], clean[, 1], alpha=1)
+glm.train<-glmnet(clean[,2:93], clean[, 1], family="multinomial", lambda=cv$lambda.min)
+new.pred<-predict(glm.train, neighbor.dat[as.integer(names(recalc)),2:93], s=lambda.min, type="response")
+pred.recalc<-rep(NA, length(recalc))
+for (j in 1:nrow(new.pred)) {
+    pred.recalc[j]<-which.max(new.pred[j,,1])
+}
+crime.pred[recalc] = pred.recalc
+save(crime.pred, recalc, file="randomForest.Rdata") # THE 24
 
 
 # whole data set
