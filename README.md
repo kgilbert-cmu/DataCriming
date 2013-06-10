@@ -8,7 +8,7 @@ This README-slash-report was last updated June 6, 2013.
 
 ![Team Paranormal Distribution](docs/ghost.png)
 
-# Abstract
+## Abstract
 
 The purpose of this study is to accurately determine the unknown crime levels of neighborhoods in
 a city. We first attempt to unveil the underlying structure of the data using principal component
@@ -19,7 +19,7 @@ misclassification rate of 31%, whereas applying these methods individually incur
 rate of over 40%. After further inspection, we also discover that the data is from the city of
 Pittsburgh, Pennsylvania.
 
-# 1: Introduction
+## 1: Introduction
 
 We have data on 79 neighborhoods within an unknown city. For each neighborhood, we are given
 92 predictor variables such as median income, population, area, and many others. Of the 79
@@ -34,7 +34,7 @@ idea that crime in one neighborhood should be correlated with crime in adjacent 
 As outlined in a later section, this method is quite naive. Our superior method utilizes as much
 information from the datset as possible in a “random forest"
 
-# 2: Unsupervised Analysis
+## 2: Unsupervised Analysis
 
 Noting that there are significantly more variables than the number of known crime observations,
 our first step is to necessarily reduce the dimension of our solution space. If we attempt to use
@@ -79,7 +79,7 @@ our actual classification method for predicting the missing values. This was jus
 find for us that we did not expect to come across; hence, it warrants mention in the unsupervised
 analysis.
 
-# 3: Supervised Analysis
+## 3: Supervised Analysis
 
 Diving into a model that would be able to utilize the parameters given for each neighborhood, we
 moved onto a **random forest** model. This concept is an ensemble method that was mentioned,
@@ -102,7 +102,7 @@ particular classification would be selected with only the votes of 40% of the tr
 but at least a plurality. In these cases, we decided to raise the cutoff. If the forest wasn't certain,
 then we would recalculate the observation in question.
 
-![CV error levels out after 100 decision trees are added to the forest.](/docs/rf_error.jpg)
+![CV error levels out after 100 decision trees are added to the forest.](/docs/rf_error.jpeg)
 
 Now enters our backup model: the LASSO. Using the `glmnet` package, we trained a generalized
 linear model on the available data and tuned it to predict a multinomial set of very few obser-
@@ -114,9 +114,9 @@ neighborhoods. Then, we would be able to leverage as many points as possible to 
 small set of rejected random forest predictions (usually between 0 and 7 in a given fold). A plot of
 the CV error given regularization parameter is shown in Figure 6.
 
-![Regularization parameter selection minimizes error](/docs/lasso.jpg)
+![Regularization parameter selection minimizes error](/docs/lasso.jpeg)
 
-# 4: Conclusion
+## 4: Conclusion
 
 We obtain a 4-fold cross-validated misclassification rate of 31% on our final two-stage model. We
 decided that this was a very positive result, because individual methods (such as k-NN, LASSO,
