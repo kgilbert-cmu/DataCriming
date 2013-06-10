@@ -1,10 +1,12 @@
 *Andy, Kevin, and Jason want you to know that this write-up can also be found in /docs/paper/report.pdf*
 
+This README-slash-report was last updated June 6, 2013.
+
 # 36-462 Special Topics: Data Mining
 
 ## Final Report by Chung, Gilbert, & Sun
 
-![Team Paranormal Distribution](/docs/ghost.png)
+![Team Paranormal Distribution](docs/ghost.png)
 
 # Abstract
 
@@ -95,9 +97,9 @@ data. In particular, our random forest was not very accurate or consistent at pr
 samples with crime level of 3, with misclassification errors varying from 40% to 90%. On the other
 hand, it was extremely good at discerning the difference between low crime and medium crime
 errors, sometimes getting error rates below 7% within the fold. We felt that it was necessary to
-address our random forest’s problem when many trees disagreed with the concensus. Sometimes, a 
+address our random forest's problem when many trees disagreed with the concensus. Sometimes, a 
 particular classification would be selected with only the votes of 40% of the trees, not a majority
-but at least a plurality. In these cases, we decided to raise the cutoff. If the forest wasn’t certain,
+but at least a plurality. In these cases, we decided to raise the cutoff. If the forest wasn't certain,
 then we would recalculate the observation in question.
 
 ![CV error levels out after 100 decision trees are added to the forest.](/docs/rf_error.jpg)
