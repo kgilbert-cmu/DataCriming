@@ -27,10 +27,10 @@ geographical distance between each neighborhood. Our research goal is to predict
 (withheld) crime levels for the 24 neighborhoods as accurately as possible. We have two basic
 approaches to predicting crime: geographical and statistical.
 
-One of the foremost concepts that our group wanted to investigate was “crime spillover”, a basic
+One of the foremost concepts that our group wanted to investigate was “crime spillover", a basic
 idea that crime in one neighborhood should be correlated with crime in adjacent neighborhoods.
 As outlined in a later section, this method is quite naive. Our superior method utilizes as much
-information from the datset as possible in a “random forest”
+information from the datset as possible in a “random forest"
 
 # 2: Unsupervised Analysis
 
@@ -59,7 +59,7 @@ it caused us to eliminate k-NN from consideration.
 ![Plot of first two components from PCA, color coded and numbered by crime rate](/docs/pca-twodim.jpeg)
 
 Essentially, a k-NN algorithm would allow us to classify crime levels according to nearby neighbor-
-hoods. This idea only uses geographical parameters to determine Euclidean “distance” between
+hoods. This idea only uses geographical parameters to determine Euclidean “distance" between
 nodes. Unfortunately, even at the best accuracy rate, shared by very small k = 2 and very high
 k = 13, k-NN was unable to provide the kind of accuracy that we desired. The deficiency should
 be apparent if we think about the information available to us. Firstly, although neighborhoods are
@@ -83,7 +83,7 @@ Diving into a model that would be able to utilize the parameters given for each 
 moved onto a **random forest** model. This concept is an ensemble method that was mentioned,
 though not formally introduced, during this course. A random forest is a bagging method: we take
 many, many decision trees and report the classification of the mode of the set of trees, rather than
-attempt to construct some sort of “average” or “best” decision tree. Each decision tree in the forest
+attempt to construct some sort of “average" or “best" decision tree. Each decision tree in the forest
 is trained on a random selection of the features in the dataset. In order to determine the optimal
 number of trees to populate our forest, a plot of cross-validation error is given in Figure 5. The
 overall out-of-bag error of the random forest levels out after about 100 trees.
@@ -105,7 +105,7 @@ then we would recalculate the observation in question.
 Now enters our backup model: the LASSO. Using the `glmnet` package, we trained a generalized
 linear model on the available data and tuned it to predict a multinomial set of very few obser-
 vations given a very large set of data. Whenever the random forest made a prediction where the
-“winning” classification was made without a majority of the total votes, we passed the observation
+“winning" classification was made without a majority of the total votes, we passed the observation
 to the LASSO model and instead reported the back-up prediction. In training the LASSO model,
 we choose the regularization parameter that minimized our total error on the set of 55 known
 neighborhoods. Then, we would be able to leverage as many points as possible to predict a very
@@ -122,4 +122,4 @@ and decision trees) could barely scratch 40% misclassification. Our decision to 
 validation was based on the proportion of 24 missing values. With four folds, every fold would
 make 13 predictions using 42 observations, which is a similar ratio to making 24 predictions using
 55 observations. In conclusion, we are quite pleased to predict that crime in the city of Pittsburgh
-is most often “low” crime.
+is most often "low" crime.
